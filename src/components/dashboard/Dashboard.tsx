@@ -82,7 +82,9 @@ export default function Dashboard() {
             </div>
             <WeatherCard />
             <EnergyUsageCard />
-            <ThermostatCard className="md:col-span-2" />
+            <div className="md:col-span-2">
+              <ThermostatCard />
+            </div>
             <WaterCard />
           </div>
         </div>
