@@ -31,7 +31,7 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
-      <main className="flex-1 p-6 lg:p-8 overflow-hidden">
+      <main className="flex-1 overflow-hidden">
         {renderView()}
       </main>
     </div>

@@ -9,17 +9,31 @@ import WeatherCard from '../cards/WeatherCard';
 import EnergyUsageCard from '../cards/EnergyUsageCard';
 import ThermostatCard from '../cards/ThermostatCard';
 import WaterCard from '../cards/WaterCard';
+import WidgetSettings from '../WidgetSettings';
 import { getCurrentTime, getGreeting } from '@/lib/mock';
-import { CheckCircle2, Bell, GripVertical } from 'lucide-react';
+import { CheckCircle2, Bell, GripVertical, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface WidgetItem {
   id: string;
+  name: string;
   component: React.ReactNode;
   size: 'normal' | 'tall' | 'wide';
 }
 
-function SortableWidget({ id, children, size }: { id: string; children: React.ReactNode; size: 'normal' | 'tall' | 'wide' }) {
+function SortableWidget({ 
+  id, 
+  children, 
+  size, 
+  name,
+  onSettingsOpen 
+}: { 
+  id: string; 
+  children: React.ReactNode; 
+  size: 'normal' | 'tall' | 'wide';
+  name: string;
+  onSettingsOpen: () => void;
+}) {
   const {
     attributes,
     listeners,
@@ -46,11 +60,20 @@ function SortableWidget({ id, children, size }: { id: string; children: React.Re
         isDragging && 'z-50'
       )}
     >
-      <div className="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+      <div className="absolute top-3 right-3 z-30 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSettingsOpen();
+          }}
+          className="p-2 rounded-lg bg-card/90 border border-border/40 backdrop-blur-md shadow-xl hover:bg-card hover:border-border/60 transition-all"
+        >
+          <Settings className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+        </button>
         <div
           {...attributes}
           {...listeners}
-          className="p-2 rounded-lg bg-card/90 border border-border/40 backdrop-blur-md shadow-xl hover:bg-card hover:border-border/60 transition-all"
+          className="p-2 rounded-lg bg-card/90 border border-border/40 backdrop-blur-md shadow-xl hover:bg-card hover:border-border/60 transition-all cursor-grab active:cursor-grabbing"
         >
           <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground" />
         </div>
@@ -115,14 +138,16 @@ function OverviewSection({ currentTime, greeting }: { currentTime: string; greet
 export default function HomeView() {
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const greeting = getGreeting();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectedWidget, setSelectedWidget] = useState<string | null>(null);
 
   const [widgets, setWidgets] = useState<WidgetItem[]>([
-    { id: 'overview', component: <OverviewSection currentTime={currentTime} greeting={greeting} />, size: 'normal' },
-    { id: 'alerts', component: <AlertsCard />, size: 'tall' },
-    { id: 'weather', component: <WeatherCard />, size: 'normal' },
-    { id: 'energy', component: <EnergyUsageCard />, size: 'normal' },
-    { id: 'thermostat', component: <ThermostatCard />, size: 'normal' },
-    { id: 'water', component: <WaterCard />, size: 'normal' },
+    { id: 'overview', name: 'Übersicht', component: <OverviewSection currentTime={currentTime} greeting={greeting} />, size: 'normal' },
+    { id: 'alerts', name: 'Warnungen', component: <AlertsCard />, size: 'tall' },
+    { id: 'weather', name: 'Wetter', component: <WeatherCard />, size: 'normal' },
+    { id: 'energy', name: 'Energie', component: <EnergyUsageCard />, size: 'normal' },
+    { id: 'thermostat', name: 'Thermostat', component: <ThermostatCard />, size: 'normal' },
+    { id: 'water', name: 'Wasser', component: <WaterCard />, size: 'normal' },
   ]);
 
   const sensors = useSensors(
@@ -176,27 +201,73 @@ export default function HomeView() {
     }
   }
 
+  function handleSettingsOpen(widgetId: string) {
+    setSelectedWidget(widgetId);
+    setSettingsOpen(true);
+  }
+
+  function handleSizeChange(size: 'normal' | 'tall' | 'wide') {
+    if (selectedWidget) {
+      setWidgets((items) =>
+        items.map((item) =>
+          item.id === selectedWidget ? { ...item, size } : item
+        )
+      );
+    }
+  }
+
+  const selectedWidgetData = widgets.find((w) => w.id === selectedWidget);
+
   return (
-    <div className="h-full overflow-hidden p-6 lg:p-8">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={widgets.map((w) => w.id)}
-          strategy={rectSortingStrategy}
+    <>
+      <div className="h-full overflow-hidden p-6 lg:p-8">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 h-full overflow-hidden auto-rows-fr">
-            {widgets.map((widget) => (
-              <SortableWidget key={widget.id} id={widget.id} size={widget.size}>
-                {widget.component}
-              </SortableWidget>
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
-    </div>
+          <SortableContext
+            items={widgets.filter((w) => w.id !== 'overview').map((w) => w.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 h-full overflow-hidden">
+              {/* Overview Section - Links, nicht dragable */}
+              <div className="lg:col-span-1 h-full min-h-0">
+                <OverviewSection currentTime={currentTime} greeting={greeting} />
+              </div>
+              
+              {/* Widget Grid - Rechts, dragable */}
+              <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 h-full overflow-hidden auto-rows-fr">
+                {widgets
+                  .filter((w) => w.id !== 'overview')
+                  .map((widget) => (
+                    <SortableWidget
+                      key={widget.id}
+                      id={widget.id}
+                      size={widget.size}
+                      name={widget.name}
+                      onSettingsOpen={() => handleSettingsOpen(widget.id)}
+                    >
+                      {widget.component}
+                    </SortableWidget>
+                  ))}
+              </div>
+            </div>
+          </SortableContext>
+        </DndContext>
+      </div>
+
+      {selectedWidgetData && (
+        <WidgetSettings
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          widgetId={selectedWidgetData.id}
+          widgetName={selectedWidgetData.name}
+          size={selectedWidgetData.size}
+          onSizeChange={handleSizeChange}
+        />
+      )}
+    </>
   );
 }
 
