@@ -132,14 +132,51 @@
 
 /* Custom styles für Dashboard */
 .dashboard-card {
-  @apply bg-card border border-border/30 rounded-2xl;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 0 1px rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply bg-card border border-border/20 rounded-2xl;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .dashboard-card:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-  border-color: hsl(var(--border) / 0.5);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  transform: translateY(-3px);
+  border-color: hsl(var(--border) / 0.4);
+}
+
+.dashboard-card:hover::before {
+  opacity: 1;
+}
+
+/* Subtle glow effect for active elements */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb, 59, 130, 246), 0.15);
+}
+
+/* Smooth text rendering */
+.text-smooth {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
