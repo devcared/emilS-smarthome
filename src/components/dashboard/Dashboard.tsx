@@ -22,12 +22,12 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
       <Sidebar />
-      <main className="flex-1 p-6 lg:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      <main className="flex-1 p-6 lg:p-8 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 h-full">
           {/* Left Overview Section */}
-          <div className="lg:col-span-1 space-y-8">
+          <div className="lg:col-span-1 space-y-6 overflow-hidden flex flex-col">
             <div className="space-y-5">
               <div className="flex items-center justify-between">
                 <div className="text-6xl font-bold text-foreground tracking-tight">
@@ -47,7 +47,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="space-y-5 pt-4">
+            <div className="space-y-4 pt-2 flex-1 overflow-hidden">
               <div className="opacity-40">
                 <div className="text-sm text-muted-foreground mb-1.5 font-medium">Geräte</div>
               </div>
@@ -76,16 +76,22 @@ export default function Dashboard() {
           </div>
 
           {/* Right Grid Section */}
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 auto-rows-min">
-            <div className="md:row-span-2">
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 grid-rows-3 gap-6 lg:gap-8 h-full overflow-hidden">
+            <div className="md:row-span-2 h-full min-h-0">
               <AlertsCard />
             </div>
-            <WeatherCard />
-            <EnergyUsageCard />
-            <div className="md:col-span-2">
+            <div className="h-full min-h-0">
+              <WeatherCard />
+            </div>
+            <div className="h-full min-h-0">
+              <EnergyUsageCard />
+            </div>
+            <div className="md:col-span-2 h-full min-h-0">
               <ThermostatCard />
             </div>
-            <WaterCard />
+            <div className="h-full min-h-0">
+              <WaterCard />
+            </div>
           </div>
         </div>
       </main>

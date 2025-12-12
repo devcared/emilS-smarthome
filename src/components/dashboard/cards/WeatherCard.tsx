@@ -6,9 +6,9 @@ export default function WeatherCard() {
   const { location, temperature, high, low, humidity, forecast } = mockWeather;
 
   return (
-    <Card className="dashboard-card bg-gradient-to-br from-orange-600/25 via-orange-500/15 to-orange-400/10 border-orange-500/30 overflow-hidden relative">
+    <Card className="dashboard-card h-full flex flex-col bg-gradient-to-br from-orange-600/25 via-orange-500/15 to-orange-400/10 border-orange-500/30 overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" />
-      <CardContent className="p-6 relative z-10">
+      <CardContent className="p-6 relative z-10 flex-1 flex flex-col justify-center">
         <div className="flex items-start justify-between mb-5">
           <div>
             <h3 className="text-sm font-medium text-muted-foreground/90 mb-2 tracking-wide">

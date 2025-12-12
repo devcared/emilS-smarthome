@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 
 export default function AlertsCard() {
   return (
-    <Card className="dashboard-card">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-5">
+    <Card className="dashboard-card h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
         <CardTitle className="flex items-center gap-2.5 text-lg font-semibold">
           <AlertCircle className="h-5 w-5 text-destructive" />
           <span>Warnungen {mockAlerts.length}</span>
@@ -19,8 +19,8 @@ export default function AlertsCard() {
           ALLE
         </button>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full pr-4 pl-6">
           <div className="space-y-0">
             {mockAlerts.map((alert, index) => (
               <div key={alert.id}>

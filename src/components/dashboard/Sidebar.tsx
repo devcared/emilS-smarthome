@@ -16,7 +16,7 @@ export default function Sidebar() {
   const [activeId, setActiveId] = useState('home');
 
   return (
-    <aside className="w-20 bg-card/50 backdrop-blur-sm border-r border-border/30 flex flex-col items-center py-8 space-y-4 rounded-r-2xl">
+    <aside className="w-20 bg-card/50 backdrop-blur-sm border-r border-border/30 flex flex-col items-center py-8 space-y-4 h-full">
       {icons.map(({ Icon, id }) => (
         <button
           key={id}

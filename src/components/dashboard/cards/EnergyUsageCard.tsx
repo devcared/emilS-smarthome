@@ -15,8 +15,8 @@ export default function EnergyUsageCard() {
   const maxValue = Math.max(...data.dailyData.map((d) => d.value));
 
   return (
-    <Card className="dashboard-card">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-5">
+    <Card className="dashboard-card h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
         <CardTitle className="text-lg font-semibold">Energieverbrauch</CardTitle>
         <Tabs value={period} onValueChange={(v) => setPeriod(v as typeof period)}>
           <TabsList className="h-8 bg-muted/50">
@@ -26,8 +26,8 @@ export default function EnergyUsageCard() {
           </TabsList>
         </Tabs>
       </CardHeader>
-      <CardContent>
-        <div className="mb-5">
+      <CardContent className="flex-1 flex flex-col min-h-0">
+        <div className="mb-4 flex-shrink-0">
           <div className="flex items-baseline gap-3 mb-3">
             <span className="text-5xl font-bold text-foreground tracking-tight">
               {data.current}
@@ -47,7 +47,7 @@ export default function EnergyUsageCard() {
             <span className="text-foreground font-semibold">{data.solarPercent}%</span>
           </div>
         </div>
-        <div className="h-[200px]">
+        <div className="flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.dailyData} margin={{ top: 15, right: 5, left: -10, bottom: 5 }}>
               <XAxis

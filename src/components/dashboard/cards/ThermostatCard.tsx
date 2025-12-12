@@ -12,15 +12,15 @@ export default function ThermostatCard() {
   const currentPosition = 35; // Aktuelle Position auf der Timeline
 
   return (
-    <Card className="dashboard-card">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-5">
+    <Card className="dashboard-card h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 flex-shrink-0">
         <CardTitle className="text-lg font-semibold">Thermostat</CardTitle>
         <Button variant="outline" size="sm" className="text-xs h-8 px-4 border-border/50 hover:bg-muted/50">
           KONFIGURIEREN
         </Button>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-7">
+      <CardContent className="flex-1 flex flex-col justify-center">
+        <div className="space-y-6">
           <div className="text-6xl font-bold text-foreground tracking-tight">
             {currentTemp}°C
           </div>
