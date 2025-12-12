@@ -6,28 +6,34 @@ export default function WeatherCard() {
   const { location, temperature, high, low, humidity, forecast } = mockWeather;
 
   return (
-    <Card className="dashboard-card h-full flex flex-col bg-gradient-to-br from-orange-600/30 via-orange-500/20 to-orange-400/12 border-orange-500/25 overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/8 via-transparent to-orange-400/5 pointer-events-none" />
-      <div className="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 rounded-full blur-3xl pointer-events-none" />
-      <CardContent className="p-6 relative z-10 flex-1 flex flex-col justify-center">
-        <div className="flex items-start justify-between mb-6">
+    <Card className="dashboard-card h-full flex flex-col bg-gradient-to-br from-orange-600/35 via-orange-500/25 to-orange-400/15 border-orange-500/30 overflow-hidden relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/12 via-orange-400/6 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-40 h-40 bg-orange-400/15 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-500/8 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent pointer-events-none" />
+      <CardContent className="p-7 relative z-10 flex-1 flex flex-col justify-center">
+        <div className="flex items-start justify-between mb-7">
           <div>
-            <h3 className="text-xs font-medium text-muted-foreground/80 mb-3 tracking-wider uppercase">
+            <h3 className="text-xs font-bold text-muted-foreground/70 mb-4 tracking-[0.2em] uppercase">
               {location}
             </h3>
-            <div className="text-7xl font-bold text-foreground leading-none tracking-tighter text-smooth">
+            <div className="text-8xl font-black text-foreground leading-none tracking-tighter text-smooth drop-shadow-lg">
               {temperature}°C
             </div>
           </div>
           <div className="relative">
-            <CloudMoon className="h-16 w-16 text-orange-400/95 drop-shadow-xl" strokeWidth={1.5} />
-            <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-xl" />
+            <div className="absolute inset-0 bg-orange-400/25 rounded-full blur-2xl animate-pulse" />
+            <CloudMoon className="h-20 w-20 text-orange-300/95 drop-shadow-2xl relative z-10" strokeWidth={1.5} />
           </div>
         </div>
-        <div className="text-sm text-muted-foreground/85 mb-5 font-semibold tracking-wide">
-          H: {high}° T: {low}° LF: {humidity}%
+        <div className="flex items-center gap-4 text-sm text-muted-foreground/90 mb-6 font-bold tracking-wider">
+          <span>H: {high}°</span>
+          <span className="opacity-50">•</span>
+          <span>T: {low}°</span>
+          <span className="opacity-50">•</span>
+          <span>LF: {humidity}%</span>
         </div>
-        <div className="text-xs text-muted-foreground/70 leading-relaxed font-medium">
+        <div className="text-xs text-muted-foreground/75 leading-relaxed font-semibold tracking-wide">
           {forecast}
         </div>
       </CardContent>
