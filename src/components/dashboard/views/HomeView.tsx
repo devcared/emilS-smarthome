@@ -16,10 +16,10 @@ import { cn } from '@/lib/utils';
 interface WidgetItem {
   id: string;
   component: React.ReactNode;
-  size: 'normal' | 'tall';
+  size: 'normal' | 'tall' | 'wide';
 }
 
-function SortableWidget({ id, children, size }: { id: string; children: React.ReactNode; size: 'normal' | 'tall' }) {
+function SortableWidget({ id, children, size }: { id: string; children: React.ReactNode; size: 'normal' | 'tall' | 'wide' }) {
   const {
     attributes,
     listeners,
@@ -42,6 +42,7 @@ function SortableWidget({ id, children, size }: { id: string; children: React.Re
       className={cn(
         'h-full min-h-0 relative group',
         size === 'tall' ? 'md:row-span-2' : '',
+        size === 'wide' ? 'md:col-span-2 lg:col-span-2' : '',
         isDragging && 'z-50'
       )}
     >
@@ -59,11 +60,64 @@ function SortableWidget({ id, children, size }: { id: string; children: React.Re
   );
 }
 
+function OverviewSection({ currentTime, greeting }: { currentTime: string; greeting: string }) {
+  return (
+    <div className="h-full space-y-6 overflow-hidden flex flex-col bg-card border border-border/20 rounded-2xl p-6 dashboard-card">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="text-5xl font-bold text-foreground tracking-tighter text-smooth leading-none">
+            {currentTime}
+          </div>
+          <div className="relative cursor-pointer group">
+            <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10 shadow-xl shadow-red-500/60 ring-2 ring-red-500/30 animate-pulse">
+              6
+            </div>
+            <div className="h-10 w-10 rounded-full bg-muted/40 border border-border/40 flex items-center justify-center group-hover:bg-muted/60 group-hover:border-border/60 transition-all duration-300 group-hover:scale-110">
+              <Bell className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-all duration-300" strokeWidth={2} />
+            </div>
+          </div>
+        </div>
+        <div className="text-xl text-muted-foreground/90 font-light tracking-wide">
+          {greeting}, Emerson
+        </div>
+      </div>
+
+      <div className="space-y-3 pt-2 flex-1 overflow-hidden">
+        <div className="opacity-35 transition-opacity hover:opacity-60 cursor-default">
+          <div className="text-sm text-muted-foreground/70 mb-1.5 font-semibold tracking-wide">Geräte</div>
+        </div>
+        <div className="transition-all hover:translate-x-1">
+          <div className="text-sm text-muted-foreground/80 mb-1.5 font-semibold tracking-wide">KI</div>
+          <div className="text-xs text-foreground/70 font-medium">Aktive Routinen</div>
+        </div>
+        <div className="transition-all hover:translate-x-1">
+          <div className="text-sm font-bold text-foreground mb-1.5 flex items-center gap-2">
+            Übersicht
+            <div className="h-2 w-2 rounded-full bg-green-500 shadow-lg shadow-green-500/60 ring-2 ring-green-500/30 animate-pulse"></div>
+          </div>
+          <div className="text-xs text-muted-foreground/80 font-medium">Alles sicher</div>
+        </div>
+        <div className="transition-all hover:translate-x-1">
+          <div className="text-sm text-muted-foreground/80 mb-1.5 font-semibold tracking-wide">Beleuchtung</div>
+          <div className="text-xs text-foreground/70 font-medium">Lichter an</div>
+        </div>
+        <div className="opacity-35 transition-opacity hover:opacity-60 cursor-default">
+          <div className="text-sm text-muted-foreground/70 mb-1.5 font-semibold tracking-wide">Energie</div>
+        </div>
+        <div className="opacity-35 transition-opacity hover:opacity-60 cursor-default">
+          <div className="text-sm text-muted-foreground/70 mb-1.5 font-semibold tracking-wide">Sprechanlage</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HomeView() {
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const greeting = getGreeting();
 
   const [widgets, setWidgets] = useState<WidgetItem[]>([
+    { id: 'overview', component: <OverviewSection currentTime={currentTime} greeting={greeting} />, size: 'normal' },
     { id: 'alerts', component: <AlertsCard />, size: 'tall' },
     { id: 'weather', component: <WeatherCard />, size: 'normal' },
     { id: 'energy', component: <EnergyUsageCard />, size: 'normal' },
@@ -89,6 +143,22 @@ export default function HomeView() {
     return () => clearInterval(interval);
   }, []);
 
+  // Update overview component when time changes
+  useEffect(() => {
+    setWidgets((prev) => {
+      const overviewIndex = prev.findIndex((w) => w.id === 'overview');
+      if (overviewIndex !== -1) {
+        const updated = [...prev];
+        updated[overviewIndex] = {
+          ...updated[overviewIndex],
+          component: <OverviewSection currentTime={currentTime} greeting={greeting} />,
+        };
+        return updated;
+      }
+      return prev;
+    });
+  }, [currentTime, greeting]);
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -107,77 +177,25 @@ export default function HomeView() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 h-full">
-      {/* Left Overview Section */}
-      <div className="lg:col-span-1 space-y-6 overflow-hidden flex flex-col">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-5xl font-bold text-foreground tracking-tighter text-smooth leading-none">
-              {currentTime}
-            </div>
-            <div className="relative cursor-pointer group">
-              <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold z-10 shadow-xl shadow-red-500/60 ring-2 ring-red-500/30 animate-pulse">
-                6
-              </div>
-              <div className="h-10 w-10 rounded-full bg-muted/40 border border-border/40 flex items-center justify-center group-hover:bg-muted/60 group-hover:border-border/60 transition-all duration-300 group-hover:scale-110">
-                <Bell className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-all duration-300" strokeWidth={2} />
-              </div>
-            </div>
-          </div>
-          <div className="text-xl text-muted-foreground/90 font-light tracking-wide">
-            {greeting}, Emerson
-          </div>
-        </div>
-
-        <div className="space-y-3 pt-2 flex-1 overflow-hidden">
-          <div className="opacity-35 transition-opacity hover:opacity-60 cursor-default">
-            <div className="text-sm text-muted-foreground/70 mb-1.5 font-semibold tracking-wide">Geräte</div>
-          </div>
-          <div className="transition-all hover:translate-x-1">
-            <div className="text-sm text-muted-foreground/80 mb-1.5 font-semibold tracking-wide">KI</div>
-            <div className="text-xs text-foreground/70 font-medium">Aktive Routinen</div>
-          </div>
-          <div className="transition-all hover:translate-x-1">
-            <div className="text-sm font-bold text-foreground mb-1.5 flex items-center gap-2">
-              Übersicht
-              <div className="h-2 w-2 rounded-full bg-green-500 shadow-lg shadow-green-500/60 ring-2 ring-green-500/30 animate-pulse"></div>
-            </div>
-            <div className="text-xs text-muted-foreground/80 font-medium">Alles sicher</div>
-          </div>
-          <div className="transition-all hover:translate-x-1">
-            <div className="text-sm text-muted-foreground/80 mb-1.5 font-semibold tracking-wide">Beleuchtung</div>
-            <div className="text-xs text-foreground/70 font-medium">Lichter an</div>
-          </div>
-          <div className="opacity-35 transition-opacity hover:opacity-60 cursor-default">
-            <div className="text-sm text-muted-foreground/70 mb-1.5 font-semibold tracking-wide">Energie</div>
-          </div>
-          <div className="opacity-35 transition-opacity hover:opacity-60 cursor-default">
-            <div className="text-sm text-muted-foreground/70 mb-1.5 font-semibold tracking-wide">Sprechanlage</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Grid Section - Drag and Drop */}
-      <div className="lg:col-span-2 h-full overflow-hidden">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+    <div className="h-full overflow-hidden p-6 lg:p-8">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={widgets.map((w) => w.id)}
+          strategy={rectSortingStrategy}
         >
-          <SortableContext
-            items={widgets.map((w) => w.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 h-full overflow-hidden" style={{ gridAutoRows: 'minmax(0, 1fr)' }}>
-              {widgets.map((widget) => (
-                <SortableWidget key={widget.id} id={widget.id} size={widget.size}>
-                  {widget.component}
-                </SortableWidget>
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 h-full overflow-hidden auto-rows-fr">
+            {widgets.map((widget) => (
+              <SortableWidget key={widget.id} id={widget.id} size={widget.size}>
+                {widget.component}
+              </SortableWidget>
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
