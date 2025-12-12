@@ -22,14 +22,14 @@ export default function ThermostatCard() {
           KONFIGURIEREN
         </Button>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col justify-center relative z-10 min-h-0 px-6">
-        <div className="space-y-4">
+      <CardContent className="flex-1 flex flex-col justify-center relative z-10 min-h-0 p-0">
+        <div className="px-6 pb-6 flex-1 flex flex-col justify-center space-y-3">
           {/* Haupttemperatur */}
-          <div className="flex items-baseline gap-3">
-            <div className="text-5xl font-black text-foreground tracking-tighter text-smooth leading-none drop-shadow-lg">
+          <div className="flex items-baseline gap-2.5">
+            <div className="text-4xl font-black text-foreground tracking-tighter text-smooth leading-none drop-shadow-lg">
               {currentTemp}
             </div>
-            <div className="text-2xl font-black text-muted-foreground/60 tracking-tight">°C</div>
+            <div className="text-xl font-black text-muted-foreground/60 tracking-tight">°C</div>
           </div>
 
           {/* Nächste Änderung */}
@@ -37,13 +37,13 @@ export default function ThermostatCard() {
             Nächste Änderung auf <span className="text-foreground font-bold">{nextChangeTemp}°C</span> um <span className="text-foreground font-bold">{nextChangeTime}</span>
           </div>
 
-          {/* Timeline Track - verbessert */}
-          <div className="relative pt-2">
-            <div className="relative h-10 bg-muted/25 rounded-xl overflow-hidden border border-border/25 shadow-inner backdrop-blur-sm">
+          {/* Timeline Track - kompakter */}
+          <div className="relative pt-1.5">
+            <div className="relative h-8 bg-muted/25 rounded-lg overflow-hidden border border-border/25 shadow-inner backdrop-blur-sm">
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/8 to-transparent" />
               
-              {/* Timeline Segments - feinere Darstellung */}
+              {/* Timeline Segments */}
               {timelineSegments.map((_, i) => {
                 const isActive = i === currentPosition;
                 const isNearActive = Math.abs(i - currentPosition) <= 2;
@@ -59,15 +59,15 @@ export default function ThermostatCard() {
                 );
               })}
               
-              {/* Current Marker - größer und prominenter */}
+              {/* Current Marker */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 h-8 w-2 bg-primary rounded-full shadow-2xl shadow-primary/80 z-20 ring-2 ring-primary/50 ring-offset-1 ring-offset-card"
+                className="absolute top-1/2 -translate-y-1/2 h-6 w-1.5 bg-primary rounded-full shadow-xl shadow-primary/80 z-20 ring-2 ring-primary/50"
                 style={{ left: `${currentPosition * (100 / 60)}%` }}
               />
               
-              {/* Current Temp Label - verbessert */}
+              {/* Current Temp Label */}
               <div
-                className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-black text-foreground bg-card px-2.5 py-1 rounded-lg border border-border/40 shadow-xl backdrop-blur-sm z-30"
+                className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-black text-foreground bg-card px-2 py-0.5 rounded-md border border-border/40 shadow-lg backdrop-blur-sm z-30"
                 style={{ left: `${currentPosition * (100 / 60)}%` }}
               >
                 {currentTemp}°
@@ -75,19 +75,19 @@ export default function ThermostatCard() {
             </div>
           </div>
 
-          {/* Status Badges - verbessert */}
-          <div className="flex items-center gap-3 pt-2">
-            <div className="flex items-center gap-2 bg-muted/25 rounded-lg px-3 py-1.5 border border-border/25 shadow-sm">
-              <Flame className={`h-3.5 w-3.5 ${mode === 'HEAT' ? 'text-orange-400' : 'text-muted-foreground/40'}`} strokeWidth={2.5} />
+          {/* Status Badges - kompakter */}
+          <div className="flex items-center gap-2.5 pt-1.5">
+            <div className="flex items-center gap-1.5 bg-muted/25 rounded-lg px-2.5 py-1 border border-border/25 shadow-sm">
+              <Flame className={`h-3 w-3 ${mode === 'HEAT' ? 'text-orange-400' : 'text-muted-foreground/40'}`} strokeWidth={2.5} />
               <div className="flex flex-col">
-                <span className="text-[10px] text-muted-foreground/50 font-black uppercase tracking-widest leading-none">MODUS</span>
+                <span className="text-[9px] text-muted-foreground/50 font-black uppercase tracking-widest leading-none">MODUS</span>
                 <span className="text-xs font-black text-foreground tracking-tight leading-tight">{mode === 'HEAT' ? 'HEIZEN' : mode === 'COOL' ? 'KÜHLEN' : 'AUTO'}</span>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-muted/25 rounded-lg px-3 py-1.5 border border-border/25 shadow-sm">
-              <Wind className={`h-3.5 w-3.5 ${fan === 'ON' ? 'text-primary' : 'text-muted-foreground/40'}`} strokeWidth={2.5} />
+            <div className="flex items-center gap-1.5 bg-muted/25 rounded-lg px-2.5 py-1 border border-border/25 shadow-sm">
+              <Wind className={`h-3 w-3 ${fan === 'ON' ? 'text-primary' : 'text-muted-foreground/40'}`} strokeWidth={2.5} />
               <div className="flex flex-col">
-                <span className="text-[10px] text-muted-foreground/50 font-black uppercase tracking-widest leading-none">LÜFTER</span>
+                <span className="text-[9px] text-muted-foreground/50 font-black uppercase tracking-widest leading-none">LÜFTER</span>
                 <span className="text-xs font-black text-foreground tracking-tight leading-tight">{fan === 'ON' ? 'EIN' : fan === 'OFF' ? 'AUS' : 'AUTO'}</span>
               </div>
             </div>

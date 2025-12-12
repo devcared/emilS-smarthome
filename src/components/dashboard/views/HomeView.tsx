@@ -1,17 +1,86 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import AlertsCard from '../cards/AlertsCard';
 import WeatherCard from '../cards/WeatherCard';
 import EnergyUsageCard from '../cards/EnergyUsageCard';
 import ThermostatCard from '../cards/ThermostatCard';
 import WaterCard from '../cards/WaterCard';
 import { getCurrentTime, getGreeting } from '@/lib/mock';
-import { CheckCircle2, Bell } from 'lucide-react';
+import { CheckCircle2, Bell, GripVertical } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface WidgetItem {
+  id: string;
+  component: React.ReactNode;
+  size: 'normal' | 'tall';
+}
+
+function SortableWidget({ id, children, size }: { id: string; children: React.ReactNode; size: 'normal' | 'tall' }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'h-full min-h-0 relative group',
+        size === 'tall' ? 'md:row-span-2' : '',
+        isDragging && 'z-50'
+      )}
+    >
+      <div className="absolute top-3 right-3 z-30 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+        <div
+          {...attributes}
+          {...listeners}
+          className="p-2 rounded-lg bg-card/90 border border-border/40 backdrop-blur-md shadow-xl hover:bg-card hover:border-border/60 transition-all"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
 
 export default function HomeView() {
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const greeting = getGreeting();
+
+  const [widgets, setWidgets] = useState<WidgetItem[]>([
+    { id: 'alerts', component: <AlertsCard />, size: 'tall' },
+    { id: 'weather', component: <WeatherCard />, size: 'normal' },
+    { id: 'energy', component: <EnergyUsageCard />, size: 'normal' },
+    { id: 'thermostat', component: <ThermostatCard />, size: 'normal' },
+    { id: 'water', component: <WaterCard />, size: 'normal' },
+  ]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,6 +88,23 @@ export default function HomeView() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setWidgets((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        const newItems = [...items];
+        const [removed] = newItems.splice(oldIndex, 1);
+        newItems.splice(newIndex, 0, removed);
+
+        return newItems;
+      });
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 h-full">
@@ -71,23 +157,26 @@ export default function HomeView() {
         </div>
       </div>
 
-      {/* Right Grid Section */}
-      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 grid-rows-3 gap-6 lg:gap-8 h-full overflow-hidden">
-        <div className="md:row-span-2 h-full min-h-0">
-          <AlertsCard />
-        </div>
-        <div className="h-full min-h-0">
-          <WeatherCard />
-        </div>
-        <div className="h-full min-h-0">
-          <EnergyUsageCard />
-        </div>
-        <div className="md:col-span-2 h-full min-h-0">
-          <ThermostatCard />
-        </div>
-        <div className="h-full min-h-0">
-          <WaterCard />
-        </div>
+      {/* Right Grid Section - Drag and Drop */}
+      <div className="lg:col-span-2 h-full overflow-hidden">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={widgets.map((w) => w.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 h-full overflow-hidden" style={{ gridAutoRows: 'minmax(0, 1fr)' }}>
+              {widgets.map((widget) => (
+                <SortableWidget key={widget.id} id={widget.id} size={widget.size}>
+                  {widget.component}
+                </SortableWidget>
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
   );
